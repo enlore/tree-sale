@@ -1,0 +1,143 @@
+/* Import the google web fonts you want to use */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Quicksand&family=Roboto:wght@100&display=swap");
+
+/* FONTS
+font-family: "Nunito", sans-serif;
+font-family: "Quicksand", sans-serif;
+font-family: "Roboto", sans-serif; 
+*/
+
+/* COLOR PALETTE */
+/* Feel free to change these values and create your own color palette! https://coolors.co/ is a great resource */
+:root {
+  --forest-dark: #23332E;      /* PMS 5605C */
+  --sage-light: #F2EEDD;      /* PMS 7499C */
+  --sage-medium: #A9B788;     /* PMS 7494C */
+  --gold-accent: #D2B63B;     /* PMS 7752C */
+
+  --white: #FFFFFF;
+  --black: #1A1A1A;
+  --gray-border: #D9D9D9;
+  --gray-light: #F7F7F7;
+}
+
+/* GLOBAL STYLES */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Bebas Neue", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--sage-light);
+  font-family: "Barlow", sans-serif;
+  color: var(--forest-dark);
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0px 5px 20px rgba(0,0,0,.08);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Roboto", serif;
+}
+
+/* This prevents all the links in the app from having default underline */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+/* This prevents all the links in the app from turning purple after visiting */
+a:visited {
+  color: inherit;
+}
+/* This prevents all the inputs in the app from having that blue outline when in focus */
+input:focus {
+  outline: none;
+}
+
+/* GLOBAL STYLING FOR ALL THE BUTTONS BUTTONS */
+button {
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--white);
+  cursor: pointer;
+}
+
+/* These are all the color options for the buttons */
+/* If you change the color variables, be sure to change the hover colors to be a darker shade of the colors you chose*/
+.btn-primary {
+  background-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #e5a000;
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+  background-color: #0097d7;
+}
+
+.btn-warning {
+  background-color: var(--warning);
+}
+
+.btn-warning:hover {
+  background-color: #e14617;
+}
+
+.btn-info {
+  background-color: var(--info);
+}
+
+.btn-info:hover {
+  background-color: #71a500;
+}
+
+.logo {
+  border: 3px solid var(--forest-dark);
+  padding: 10px 35px;
+  font-family: "Bebas Neue";
+  font-size: 2rem;
+  letter-spacing: 2px;
+}
+
+.profile-icon {
+  width: 55px;
+  height: 55px;
+  border: 3px solid var(--forest-dark);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* main header */
+.page-title {
+  font-family: "Bebas Neue";
+  text-align: center;
+  font-size: 4rem;
+  letter-spacing: 3px;
+  margin-bottom: 50px;
+}
+
+
