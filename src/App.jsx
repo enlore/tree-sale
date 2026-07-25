@@ -1,6 +1,7 @@
 import "./index.css"
 import {Routes, Outlet, Route } from "react-router-dom"
 import { NavBar } from "./components/Nav/NavBar"
+import { AllOrders } from "./components/Orders/AllOrders"
 
 export const App = () => {
   return (
@@ -15,8 +16,8 @@ export const App = () => {
         }
       >
         <Route index element={<AllOrders />}/>
-          <Route index element={<OrderList/>}/>
-          <Route path=":orderId" element={<OrderDetails/>} />
+          {/* <Route index element={<OrderList/>}/>
+          <Route path=":orderId" element={<OrderDetails/>} /> */}
       </Route>
     </Routes>
     )
