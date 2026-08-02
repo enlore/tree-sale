@@ -27,6 +27,9 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
             )
         }
 
+        // Sort by most recent order first
+        filtered = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date))
+
         setFilteredOrders(filtered)
     }, [orders, searchTerm])
 

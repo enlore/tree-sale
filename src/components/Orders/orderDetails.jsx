@@ -23,6 +23,24 @@ export const OrderDetails = () => {
 
     if (!order) return <p>Loading...</p>
 
+    // Count how many of this homeowner's orders (including this one) are still pending
+    const activeCount = [order, ...relatedOrders].filter(o => o.status === "PENDING").length
+
+    // Combine current order + related orders, keep only unfulfilled ones
+    const unfulfilledOrders = [order, ...relatedOrders].filter(o => o.status !== "FULFILLED")
+
+    // Build a flat inventory list: exclude the planting service line item itself,
+    // but tag each remaining item with whether its order requested planting
+    const inventoryItems = unfulfilledOrders.flatMap(o =>
+        o.items
+            .filter(item => !item.name.toLowerCase().includes("planting"))
+            .map(item => ({
+                ...item,
+                needsPlanting: o.includesPlanting,
+                orderId: o.id
+            }))
+    )
+
     return (
         <section className="order-details-container">
             <div className="order-details-header">
@@ -31,11 +49,12 @@ export const OrderDetails = () => {
             </div>
 
             <div className="order-details-card">
-                <div className="order-details-top">
-                    <div className="detail-box">Date of Last Updated Order: {new Date(order.date).toLocaleDateString()}</div>
-                    <div className="detail-box">Total Orders: {relatedOrders.length + 1}</div>
-                    <div className="detail-box">Status: {order.status}</div>
-                </div>
+                <div className="detail-box status-box">Status: {order.status}</div>
+
+                <div className="detail-box date-box">Date of Recent Order: {new Date(order.date).toLocaleDateString()}</div>
+                <div className="detail-box active-orders-box">Active Orders: {activeCount}</div>
+                <div className="detail-box total-orders-box">Total Orders: {relatedOrders.length + 1}</div>
+                <div className="detail-box planting-box">Planting: {order.includesPlanting ? "Yes" : "No"}</div>
 
                 <div className="order-details-middle">
                     <div className="order-details-left">
@@ -57,10 +76,12 @@ export const OrderDetails = () => {
                         </ul>
                     </div>
                     <div className="detail-box">
-                        <strong>Updated Inventory:</strong>
+                        <strong>Updated Inventory (all unfulfilled products in batch):</strong>
                         <ul>
-                            {order.items.map((item, index) => (
-                                <li key={index}>{item.name}</li>
+                            {inventoryItems.map((item, index) => (
+                                <li key={index}>
+                                    {item.name} x{item.quantity} {item.needsPlanting ? "🌱" : ""}
+                                </li>
                             ))}
                         </ul>
                     </div>

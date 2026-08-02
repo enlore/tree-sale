@@ -87,3 +87,102 @@
     font-weight: bold;
     margin: 25px 0 10px;
 }
+
+.order-details-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 50px;
+}
+
+.order-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.order-details-header .page-header {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.order-details-card {
+    border: 2px solid #000;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 15px;
+    align-items: start;
+}
+
+/* Status sits alone, offset toward the top-right */
+.status-box {
+    grid-column: 4;
+    grid-row: 1;
+    margin-top: -25px;
+}
+
+.date-box {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.active-orders-box {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.total-orders-box {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.planting-box {
+    grid-column: 4;
+    grid-row: 2;
+}
+
+.detail-box {
+    border: 2px solid #000;
+    padding: 12px 18px;
+    font-size: 1.05rem;
+}
+
+.order-details-middle {
+    grid-column: 1 / 5;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.order-details-bottom {
+    grid-column: 1 / 5;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.additional-orders {
+    grid-column: 1 / 5;
+}
+
+.additional-orders ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.additional-orders a {
+    color: #000;
+    text-decoration: underline;
+}
