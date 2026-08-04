@@ -16,6 +16,9 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
         })
     }, [statusFilter])
 
+    const [filterOption, setFilterOption] = useState("none")
+
+// Apply this in your existing filter useEffect, alongside searchTerm
     useEffect(() => {
         let filtered = orders
 
@@ -27,11 +30,14 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
             )
         }
 
-        // Sort by most recent order first
+        if (filterOption === "discount") {
+            filtered = filtered.filter(order => order.hasDiscount)
+        }
+
         filtered = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date))
 
         setFilteredOrders(filtered)
-    }, [orders, searchTerm])
+    }, [orders, searchTerm, filterOption])
 
     const groupedOrders = () => {
         if (groupBy === "none") {
@@ -71,6 +77,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
                     <option value="none">Filter Drop-down</option>
                     <option value="zip">Zip Code (Proximity)</option>
                     <option value="homeowner">Homeowner</option>
+                    <option value="discount">Discount Code Used</option>
                 </select>
 
                 <SearchBar setSearchTerm={setSearchTerm} />
