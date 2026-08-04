@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000"  // ← we'll change this to the Render URL in Step 5
+const BASE_URL = "https://tree-sale-backend.onrender.com"
 
 export const getAllOrders = (status) => {
     const url = status
