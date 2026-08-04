@@ -19,6 +19,6 @@ export const getOrdersByCustomer = (customerId) => {
 }
 
 export const getSalesData = () => {
-    return fetch('${BASE_URL}/api/sales')
+    return fetch(`${BASE_URL}/api/sales`)
         .then(res => res.json())
 }
