@@ -14,6 +14,7 @@ export const NavBar = () => {
                 <li><Link to='/'>All Orders</Link></li>
                 <li><Link to='/pending'>Pending</Link></li>
                 <li><Link to='/fulfilled'>Fulfilled</Link></li>
+                <li><Link to='/sales'>Sales</Link></li>
             </ul>
         </nav>
     )

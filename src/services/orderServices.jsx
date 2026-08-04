@@ -15,3 +15,8 @@ export const getOrdersByCustomer = (customerId) => {
     return fetch(`http://localhost:3000/api/customers/${customerId}/orders`)
         .then(res => res.json())
 }
+
+export const getSalesData = () => {
+    return fetch('http://localhost:3000/api/sales')
+        .then(res => res.json())
+}
