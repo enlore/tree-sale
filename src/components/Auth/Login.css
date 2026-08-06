@@ -1,0 +1,50 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    max-width: 420px;
+    width: 100%;
+    background: var(--white);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.login-logo {
+    max-height: 60px;
+    width: auto;
+}
+
+.login-title {
+    font-family: "Bebas Neue";
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+    margin: 0;
+}
+
+.login-subtitle {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.login-pending {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--forest-dark);
+}
+
+.login-error {
+    margin: 0;
+    font-size: 1rem;
+    color: #b03a2e;
+}
