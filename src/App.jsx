@@ -4,17 +4,20 @@ import { NavBar } from "./components/Nav/NavBar"
 import { AllOrders } from "./components/Orders/AllOrders"
 import { OrderDetails } from "./components/Orders/orderDetails"
 import { Sales } from "./components/Orders/Sales"
+import { Authorized } from "./components/Auth/Authorized"
+import { Login } from "./components/Auth/Login"
 
 export const App = () => {
   return (
     <Routes>
-      <Route 
-        path="/" 
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/"
         element={
-          <>
+          <Authorized>
             <NavBar/>
             <Outlet/>
-          </>
+          </Authorized>
         }
       >
         <Route index element={<AllOrders pageTitle="All Orders" />} />

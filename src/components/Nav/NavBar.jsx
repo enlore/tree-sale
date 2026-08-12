@@ -1,7 +1,15 @@
 import "./NavBar.css"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { clearToken } from "../../services/auth"
 
 export const NavBar = () => {
+    const navigate = useNavigate()
+
+    const handleSignOut = () => {
+        clearToken()
+        navigate("/login")
+    }
+
     return (
         <nav className="navbar">
             <div className="logo-box">
@@ -15,6 +23,7 @@ export const NavBar = () => {
                 <li><Link to='/pending'>Pending</Link></li>
                 <li><Link to='/fulfilled'>Fulfilled</Link></li>
                 <li><Link to='/sales'>Sales</Link></li>
+                <li><button className="sign-out" onClick={handleSignOut}>Sign Out</button></li>
             </ul>
         </nav>
     )
