@@ -4,11 +4,23 @@ import { getAllOrders } from "../../services/orderServices"
 import { SearchBar } from "./SearchBar"
 import { Order } from "./Order"
 
+const sortOrders = (orders, sortOption) => {
+    const sorted = [...orders]
+    if (sortOption === "zip") {
+        sorted.sort((a, b) => String(a.zipCode).localeCompare(String(b.zipCode)))
+    } else if (sortOption === "homeowner") {
+        sorted.sort((a, b) => a.customerName.localeCompare(b.customerName))
+    } else {
+        sorted.sort((a, b) => new Date(b.date) - new Date(a.date))
+    }
+    return sorted
+}
+
 export const AllOrders = ({ statusFilter, pageTitle }) => {
     const [orders, setOrders] = useState([])
     const [searchTerm, setSearchTerm] = useState("")
-    const [filteredOrders, setFilteredOrders] = useState([])
-    const [groupBy, setGroupBy] = useState("none")
+    const [filterOption, setFilterOption] = useState("none")
+    const [sortOption, setSortOption] = useState("newest")
 
     useEffect(() => {
         getAllOrders(statusFilter).then((orderArray) => {
@@ -16,49 +28,25 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
         })
     }, [statusFilter])
 
-    const [filterOption, setFilterOption] = useState("none")
+    let filtered = orders
 
-// Apply this in your existing filter useEffect, alongside searchTerm
-    useEffect(() => {
-        let filtered = orders
-
-        if (searchTerm !== "") {
-            filtered = filtered.filter(order =>
-                order.customerName
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-            )
-        }
-
-        if (filterOption === "discount") {
-            filtered = filtered.filter(order => order.hasDiscount)
-        }
-
-        filtered = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date))
-
-        setFilteredOrders(filtered)
-    }, [orders, searchTerm, filterOption])
-
-    const groupedOrders = () => {
-        if (groupBy === "none") {
-            return { "All Orders": filteredOrders }
-        }
-
-        const groups = {}
-
-        for (const order of filteredOrders) {
-            const key = groupBy === "zip" ? order.zipCode : order.customerId
-
-            if (!groups[key]) {
-                groups[key] = []
-            }
-            groups[key].push(order)
-        }
-
-        return groups
+    if (searchTerm !== "") {
+        filtered = filtered.filter(order =>
+            order.customerName
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+        )
     }
 
-    const groups = groupedOrders()
+    if (filterOption === "planting") {
+        filtered = filtered.filter(order => order.includesPlanting)
+    }
+
+    if (filterOption === "discount") {
+        filtered = filtered.filter(order => order.hasDiscount)
+    }
+
+    const filteredOrders = sortOrders(filtered, sortOption)
 
     return (
     <div className="app-container">
@@ -68,35 +56,38 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
             <h2 className="page-header">{pageTitle}</h2>
 
             <div className="controls-right">
-                <select
-                    id="groupBy"
-                    className="group-filter"
-                    value={groupBy}
-                    onChange={(event) => setGroupBy(event.target.value)}
-                >
-                    <option value="none">Filter Drop-down</option>
-                    <option value="zip">Zip Code (Proximity)</option>
-                    <option value="homeowner">Homeowner</option>
-                    <option value="discount">Discount Code Used</option>
-                </select>
+                <label className="control-select">
+                    <span className="control-select-label">Filter</span>
+                    <select
+                        value={filterOption}
+                        onChange={(event) => setFilterOption(event.target.value)}
+                    >
+                        <option value="none">All orders</option>
+                        <option value="planting">Planting requested</option>
+                        <option value="discount">Discount used</option>
+                    </select>
+                </label>
+
+                <label className="control-select">
+                    <span className="control-select-label">Sort</span>
+                    <select
+                        value={sortOption}
+                        onChange={(event) => setSortOption(event.target.value)}
+                    >
+                        <option value="newest">Newest first</option>
+                        <option value="zip">Zip proximity</option>
+                        <option value="homeowner">Homeowner</option>
+                    </select>
+                </label>
 
                 <SearchBar setSearchTerm={setSearchTerm} />
             </div>
         </div>
 
-        {Object.entries(groups).map(([groupKey, groupOrders]) => (
-            <div key={groupKey} className="order-group">
-                {groupBy !== "none" && (
-                    <h3 className="group-heading">
-                        {groupBy === "zip" ? `Zip Code: ${groupKey}` : `Homeowner: ${groupOrders[0].customerName}`}
-                    </h3>
-                )}
-                <div className="order-list">
-                    {groupOrders.map((orderObj) => (
-                        <Order key={orderObj.id} order={orderObj} />
-                    ))}
-                </div>
-            </div>
-        ))}
+        <div className="order-list">
+            {filteredOrders.map((orderObj) => (
+                <Order key={orderObj.id} order={orderObj} />
+            ))}
+        </div>
     </div>
 )}

@@ -1,6 +1,15 @@
+import "./Orders.css"
 import { getOrderById, getOrdersByCustomer } from "../../services/orderServices";
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
+import { StatusBadge } from "./StatusBadge"
+import { SproutIcon } from "./SproutIcon"
+
+const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+
+const summarizeItems = (items) =>
+    items.map(item => item.quantity > 1 ? `${item.name} x${item.quantity}` : item.name).join(", ")
 
 export const OrderDetails = () => {
     const { orderId } = useParams()
@@ -42,66 +51,86 @@ export const OrderDetails = () => {
     )
 
     return (
-        <section className="order-details-container">
+        <section className="app-container order-details">
             <div className="order-details-header">
-                <h2 className="page-header">Order Details</h2>
+                <div className="order-details-title">
+                    <h2 className="page-header">Order Details</h2>
+                    <StatusBadge status={order.status} large />
+                </div>
                 <button className="edit-btn">Edit</button>
             </div>
 
-            <div className="order-details-card">
-                <div className="detail-box status-box">Status: {order.status}</div>
-
-                <div className="detail-box date-box">Date of Recent Order: {new Date(order.date).toLocaleDateString()}</div>
-                <div className="detail-box active-orders-box">Active Orders: {activeCount}</div>
-                <div className="detail-box total-orders-box">Total Orders: {relatedOrders.length + 1}</div>
-                <div className="detail-box planting-box">Planting: {order.includesPlanting ? "Yes" : "No"}</div>
-
-                <div className="order-details-middle">
-                    <div className="order-details-left">
-                        <div className="detail-box">Homeowner Name: {order.customerName}</div>
-                        <div className="detail-box">Address: {order.address}, {order.city}, {order.state} {order.zipCode}</div>
-                    </div>
-                    <div className="detail-box notes-box">
-                        Notes: {order.notes}
+            <div className="stat-tiles">
+                <div className="stat-tile">
+                    <span className="box-label">RECENT ORDER</span>
+                    <span className="stat-value">{formatDate(order.date)}</span>
+                </div>
+                <div className="stat-tile">
+                    <span className="box-label">ACTIVE ORDERS</span>
+                    <span className="stat-value">{activeCount}</span>
+                </div>
+                <div className="stat-tile">
+                    <span className="box-label">TOTAL ORDERS</span>
+                    <span className="stat-value">{relatedOrders.length + 1}</span>
+                </div>
+                <div className="stat-tile">
+                    <span className="box-label">PLANTING</span>
+                    <div className="stat-value-row">
+                        {order.includesPlanting && <SproutIcon size={20} />}
+                        <span className="stat-value">{order.includesPlanting ? "Yes" : "No"}</span>
                     </div>
                 </div>
-
-                <div className="order-details-bottom">
-                    <div className="detail-box">
-                        <strong>Purchase(s):</strong>
-                        <ul>
-                            {order.items.map((item, index) => (
-                                <li key={index}>{item.name} - {new Date(order.date).toLocaleDateString()} - {order.status}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="detail-box">
-                        <strong>Updated Inventory (all unfulfilled products in batch):</strong>
-                        <ul>
-                            {inventoryItems.map((item, index) => (
-                                <li key={index}>
-                                    {item.name} x{item.quantity} {item.needsPlanting ? "🌱" : ""}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-
-                {relatedOrders.length > 0 && (
-                    <div className="detail-box additional-orders">
-                        <strong>Additional Orders by {order.customerName}:</strong>
-                        <ul>
-                            {relatedOrders.map((relatedOrder) => (
-                                <li key={relatedOrder.id}>
-                                    <Link to={`/order/${relatedOrder.id}`}>
-                                        {new Date(relatedOrder.date).toLocaleDateString()} — {relatedOrder.items.map(i => i.name).join(", ")} — ${relatedOrder.total}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
             </div>
+
+            <div className="detail-grid">
+                <div className="detail-box">
+                    <span className="box-label">HOMEOWNER</span>
+                    <span className="homeowner-name">{order.customerName}</span>
+                    <span className="detail-text">{order.address}, {order.city}, {order.state} {order.zipCode}</span>
+                </div>
+                <div className="detail-box">
+                    <span className="box-label">NOTES</span>
+                    <span className="detail-text">{order.notes}</span>
+                </div>
+            </div>
+
+            <div className="detail-grid">
+                <div className="detail-box detail-list">
+                    <span className="box-label">PURCHASES</span>
+                    {order.items.map((item, index) => (
+                        <div key={index} className="line-row">
+                            <span className="line-name">{item.name}</span>
+                            <span className="line-date">{formatDate(order.date)}</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="detail-box detail-list">
+                    <span className="box-label">UNFULFILLED INVENTORY (THIS BATCH)</span>
+                    {inventoryItems.map((item, index) => (
+                        <div key={index} className="line-row">
+                            <div className="line-name-group">
+                                <span className="line-name">{item.name}</span>
+                                {item.needsPlanting && <SproutIcon />}
+                            </div>
+                            <span className="line-qty">x{item.quantity}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {relatedOrders.length > 0 && (
+                <div className="detail-box detail-list">
+                    <span className="box-label">ADDITIONAL ORDERS BY {order.customerName.toUpperCase()}</span>
+                    {relatedOrders.map((relatedOrder) => (
+                        <div key={relatedOrder.id} className="related-row">
+                            <Link to={`/order/${relatedOrder.id}`} className="related-link">
+                                {formatDate(relatedOrder.date)} · {summarizeItems(relatedOrder.items)} · ${relatedOrder.total}
+                            </Link>
+                            <StatusBadge status={relatedOrder.status} />
+                        </div>
+                    ))}
+                </div>
+            )}
         </section>
     )
 }

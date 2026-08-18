@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { GoogleLogin } from "@react-oauth/google"
 import { login, setToken } from "../../services/auth"
+import logo from "../../assets/ntcc-logo.png"
 
 const messageForStatus = (status) => {
     if (status === 403) {
@@ -41,8 +42,8 @@ export const Login = () => {
         <div className="login-page">
             <div className="login-card">
                 <img
-                    src="https://images.squarespace-cdn.com/content/v1/5cb3ca007a1fbd45aeff89ea/1560265287463-4QEFFJPAQZHT9C58UDOL/NTC_Logo_Horiz%28CLR%29.png"
-                    alt="Tree Sale Logo"
+                    src={logo}
+                    alt="Nashville Tree Conservation Corps"
                     className="login-logo"
                 />
                 <h1 className="login-title">Tree Sale</h1>
