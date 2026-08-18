@@ -97,6 +97,19 @@ describe("login", () => {
         expect(JSON.parse(options.body)).toEqual({ credential: "google-credential" })
     })
 
+    it("posts to a same-origin path when VITE_API_URL is unset", async () => {
+        vi.stubEnv("VITE_API_URL", undefined)
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve({ token: "app-jwt" }),
+        })
+
+        await login("google-credential")
+
+        expect(global.fetch.mock.calls[0][0]).toBe("/api/login")
+    })
+
     it("throws an error carrying the status on 403", async () => {
         global.fetch.mockResolvedValue({ ok: false, status: 403, json: () => Promise.resolve({}) })
         await expect(login("google-credential")).rejects.toMatchObject({ status: 403 })
