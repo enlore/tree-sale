@@ -3,7 +3,7 @@ import { clearToken, getToken } from "./auth"
 export const authFetch = async (path) => {
     const token = getToken()
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const res = await fetch(`${import.meta.env.VITE_API_URL}${path}`, { headers })
+    const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}${path}`, { headers })
 
     if (res.status === 401) {
         clearToken()

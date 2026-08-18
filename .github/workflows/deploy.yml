@@ -1,0 +1,31 @@
+name: deploy-app
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: deploy-app
+  cancel-in-progress: false
+jobs:
+  test-build-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_GOOGLE_CLIENT_ID: 739923415388-vtq7qsf2d4u6q9lfis4i5ev3qjhpg68g.apps.googleusercontent.com
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+      - run: gcloud auth print-access-token >/dev/null && echo GCLOUD_TOKEN_OK
+      - run: npx firebase-tools deploy --only hosting --non-interactive

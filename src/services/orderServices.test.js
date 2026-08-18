@@ -51,6 +51,15 @@ describe("authFetch", () => {
         expect(options.headers.Authorization).toBe("Bearer app-jwt")
     })
 
+    it("falls back to a same-origin path when VITE_API_URL is unset", async () => {
+        vi.stubEnv("VITE_API_URL", undefined)
+        global.fetch.mockResolvedValue(okResponse([]))
+
+        await authFetch("/api/orders")
+
+        expect(global.fetch.mock.calls[0][0]).toBe("/api/orders")
+    })
+
     it("sends no Authorization header when there is no token", async () => {
         global.fetch.mockResolvedValue(okResponse([]))
 
