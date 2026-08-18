@@ -27,4 +27,5 @@ jobs:
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOYER_SA }}
+      - run: gcloud auth print-access-token >/dev/null && echo GCLOUD_TOKEN_OK
       - run: npx firebase-tools deploy --only hosting --non-interactive
