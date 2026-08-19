@@ -47,7 +47,7 @@ export const Login = () => {
                     className="login-logo"
                 />
                 <h1 className="login-title">Tree Sale</h1>
-                <p className="login-subtitle">Sign in with your Tree Conservation Corps account.</p>
+                <p className="login-subtitle">Sign in with the Google account we have on file for you.</p>
 
                 {pending ? (
                     <p className="login-pending">Signing in — this can take up to a minute.</p>
