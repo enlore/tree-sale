@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { getAllOrders } from "../../services/orderServices"
 import { SearchBar } from "./SearchBar"
 import { Order } from "./Order"
+import { SproutIcon } from "./SproutIcon"
 
 const sortOrders = (orders, sortOption) => {
     const sorted = [...orders]
@@ -16,8 +17,15 @@ const sortOrders = (orders, sortOption) => {
     return sorted
 }
 
+const emptyMessage = (statusFilter) => {
+    if (statusFilter === "PENDING") return "No pending orders."
+    if (statusFilter === "FULFILLED") return "No fulfilled orders."
+    return "No orders yet."
+}
+
 export const AllOrders = ({ statusFilter, pageTitle }) => {
     const [orders, setOrders] = useState([])
+    const [loadedFor, setLoadedFor] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterOption, setFilterOption] = useState("none")
     const [sortOption, setSortOption] = useState("newest")
@@ -25,8 +33,11 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
     useEffect(() => {
         getAllOrders(statusFilter).then((orderArray) => {
             setOrders(orderArray)
+            setLoadedFor(statusFilter ?? "ALL")
         })
     }, [statusFilter])
+
+    const loaded = loadedFor === (statusFilter ?? "ALL")
 
     let filtered = orders
 
@@ -83,6 +94,19 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
                 <SearchBar setSearchTerm={setSearchTerm} />
             </div>
         </div>
+
+        {loaded && orders.length === 0 && (
+            <div className="empty-state">
+                <SproutIcon size={28} />
+                <p className="empty-state-message">{emptyMessage(statusFilter)}</p>
+            </div>
+        )}
+
+        {loaded && orders.length > 0 && filteredOrders.length === 0 && (
+            <div className="empty-state">
+                <p className="empty-state-message">No orders match your search and filters.</p>
+            </div>
+        )}
 
         <div className="order-list">
             {filteredOrders.map((orderObj) => (
