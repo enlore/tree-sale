@@ -9,7 +9,7 @@
 .loading-shield {
     width: 50px;
     height: auto;
-    opacity: 0.85;
+    opacity: 0.65;
     animation: shield-spin 1.4s linear infinite;
 }
 
