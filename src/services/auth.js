@@ -6,15 +6,27 @@ export const setToken = (token) => localStorage.setItem(TOKEN_KEY, token)
 
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
 
-const expiresAt = (token) => {
+const decodePayload = (token) => {
     try {
         const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")
         const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=")
-        const { exp } = JSON.parse(atob(padded))
-        return typeof exp === "number" ? exp : null
+        return JSON.parse(atob(padded))
     } catch {
         return null
     }
+}
+
+const expiresAt = (token) => {
+    const exp = decodePayload(token)?.exp
+    return typeof exp === "number" ? exp : null
+}
+
+export const getUserEmail = () => {
+    const token = getToken()
+    if (!token) {
+        return null
+    }
+    return decodePayload(token)?.email ?? null
 }
 
 export const isAuthenticated = () => {

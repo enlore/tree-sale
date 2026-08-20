@@ -46,3 +46,10 @@
 .sign-out:hover {
     text-decoration: underline;
 }
+
+.nav-greeting {
+    margin-left: auto;
+    margin-right: 40px;
+    font-size: 1rem;
+    color: rgba(35, 51, 46, 0.6);
+}
