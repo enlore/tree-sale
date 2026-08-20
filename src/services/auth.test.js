@@ -120,3 +120,26 @@ describe("login", () => {
         await expect(login("google-credential")).rejects.toMatchObject({ status: 401 })
     })
 })
+
+describe("getUserEmail", () => {
+    beforeEach(() => {
+        localStorage.clear()
+    })
+
+    it("returns the email claim from the stored token", async () => {
+        const { getUserEmail } = await import("./auth")
+        setToken(makeToken(futureExp()))
+        expect(getUserEmail()).toBe("a@b.org")
+    })
+
+    it("returns null when no token is stored", async () => {
+        const { getUserEmail } = await import("./auth")
+        expect(getUserEmail()).toBeNull()
+    })
+
+    it("returns null for a malformed token", async () => {
+        const { getUserEmail } = await import("./auth")
+        setToken("not-a-jwt")
+        expect(getUserEmail()).toBeNull()
+    })
+})

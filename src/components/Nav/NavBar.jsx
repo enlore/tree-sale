@@ -1,10 +1,11 @@
 import "./NavBar.css"
 import { NavLink, useNavigate } from "react-router-dom"
-import { clearToken } from "../../services/auth"
+import { clearToken, getUserEmail } from "../../services/auth"
 import logo from "../../assets/ntcc-logo.png"
 
 export const NavBar = () => {
     const navigate = useNavigate()
+    const email = getUserEmail()
 
     const handleSignOut = () => {
         clearToken()
@@ -19,6 +20,7 @@ export const NavBar = () => {
                     alt="Nashville Tree Conservation Corps"
                     className="logo-img"
             /></div>
+            {email && <span className="nav-greeting">Hi {email} 👋</span>}
             <ul className="nav-links">
                 <li><NavLink to='/' end>All Orders</NavLink></li>
                 <li><NavLink to='/pending'>Pending</NavLink></li>
