@@ -62,4 +62,13 @@ describe("OrderDetails order id", () => {
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(testOrder.id)
         expect(await screen.findByText(/copied/i)).toBeInTheDocument()
     })
+
+    it("shows failure feedback when the clipboard write rejects", async () => {
+        navigator.clipboard.writeText.mockRejectedValue(new Error("denied"))
+        renderDetails()
+
+        fireEvent.click(await screen.findByRole("button", { name: /copy order id/i }))
+
+        expect(await screen.findByText(/copy failed/i)).toBeInTheDocument()
+    })
 })

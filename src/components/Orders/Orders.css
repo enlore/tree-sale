@@ -377,3 +377,9 @@
     font-size: 0.78rem;
     color: rgba(35, 51, 46, 0.4);
 }
+
+.order-id-failed {
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
+    color: rgba(35, 51, 46, 0.6);
+}
