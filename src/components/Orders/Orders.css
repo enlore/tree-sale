@@ -363,3 +363,38 @@
     font-size: 1.05rem;
     color: rgba(35, 51, 46, 0.55);
 }
+
+.order-id {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    color: rgba(35, 51, 46, 0.5);
+}
+
+.order-id:hover {
+    color: var(--forest-dark);
+}
+
+.order-id-copied {
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
+    color: var(--sage-medium);
+}
+
+.order-row-id {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.78rem;
+    color: rgba(35, 51, 46, 0.4);
+}
+
+.order-id-failed {
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
+    color: rgba(35, 51, 46, 0.6);
+}
