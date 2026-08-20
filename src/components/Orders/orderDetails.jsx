@@ -15,6 +15,14 @@ export const OrderDetails = () => {
     const { orderId } = useParams()
     const [order, setOrder] = useState(null)
     const [relatedOrders, setRelatedOrders] = useState([])
+    const [copied, setCopied] = useState(false)
+
+    const copyOrderId = () => {
+        navigator.clipboard.writeText(order.id).then(() => {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1500)
+        })
+    }
 
     useEffect(() => {
         getOrderById(orderId).then(setOrder)
@@ -56,6 +64,19 @@ export const OrderDetails = () => {
                 <div className="order-details-title">
                     <h2 className="page-header">Order Details</h2>
                     <StatusBadge status={order.status} large />
+                    <button
+                        className="order-id"
+                        onClick={copyOrderId}
+                        aria-label="Copy order ID"
+                        title="Copy order ID"
+                    >
+                        <span className="order-id-value">{order.id}</span>
+                        {copied ? (
+                            <span className="order-id-copied">Copied</span>
+                        ) : (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        )}
+                    </button>
                 </div>
                 <button className="edit-btn">Edit</button>
             </div>

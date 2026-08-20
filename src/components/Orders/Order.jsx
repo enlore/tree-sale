@@ -15,6 +15,7 @@ export const Order = ({order}) => {
                     <div className="order-title-row">
                         <span className="order-date">{formatDate(order.date)}</span>
                         <StatusBadge status={order.status} />
+                        <span className="order-row-id">{order.id}</span>
                     </div>
                     <span className="order-customer">
                         {order.customerName} · {order.city}, {order.state} {order.zipCode}
