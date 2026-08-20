@@ -1,5 +1,6 @@
 import "./Orders.css"
 import { getOrderById, getOrdersByCustomer } from "../../services/orderServices";
+import { Loading } from "../Loading"
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { StatusBadge } from "./StatusBadge"
@@ -38,7 +39,13 @@ export const OrderDetails = () => {
         }
     }, [order])
 
-    if (!order) return <p>Loading...</p>
+    if (!order) {
+        return (
+            <section className="app-container">
+                <Loading />
+            </section>
+        )
+    }
 
     // Count how many of this homeowner's orders (including this one) are still pending
     const activeCount = [order, ...relatedOrders].filter(o => o.status === "PENDING").length

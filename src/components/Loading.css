@@ -1,0 +1,17 @@
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 96px 0;
+}
+
+.loading-shield {
+    width: 50px;
+    height: auto;
+}
+
+.loading-text {
+    font-size: 1.05rem;
+    color: rgba(35, 51, 46, 0.6);
+}
