@@ -9,6 +9,22 @@
 .loading-shield {
     width: 50px;
     height: auto;
+    animation: shield-spin 1.4s linear infinite;
+}
+
+@keyframes shield-spin {
+    from {
+        transform: perspective(200px) rotateY(0deg);
+    }
+    to {
+        transform: perspective(200px) rotateY(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-shield {
+        animation: none;
+    }
 }
 
 .loading-text {
