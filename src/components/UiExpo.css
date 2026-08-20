@@ -1,0 +1,23 @@
+.expo-section {
+    border-top: 1px solid #EDE9DA;
+    padding: 20px 0 32px;
+}
+
+.expo-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: rgba(35, 51, 46, 0.55);
+    margin: 0 0 16px;
+}
+
+.expo-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.expo-sprout {
+    color: #6D7F52;
+}

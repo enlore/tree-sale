@@ -6,11 +6,13 @@ import { OrderDetails } from "./components/Orders/orderDetails"
 import { Sales } from "./components/Orders/Sales"
 import { Authorized } from "./components/Auth/Authorized"
 import { Login } from "./components/Auth/Login"
+import { UiExpo } from "./components/UiExpo"
 
 export const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/ui-expo" element={<UiExpo />} />
       <Route
         path="/"
         element={
