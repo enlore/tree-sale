@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { getToken, setToken, clearToken, isAuthenticated, login, TOKEN_KEY } from "./auth"
+import { getToken, setToken, clearToken, isAuthenticated, getUserEmail, login, TOKEN_KEY } from "./auth"
 
 const makeToken = (exp) => {
     const payload = btoa(JSON.stringify({ email: "a@b.org", exp }))
@@ -126,19 +126,16 @@ describe("getUserEmail", () => {
         localStorage.clear()
     })
 
-    it("returns the email claim from the stored token", async () => {
-        const { getUserEmail } = await import("./auth")
+    it("returns the email claim from the stored token", () => {
         setToken(makeToken(futureExp()))
         expect(getUserEmail()).toBe("a@b.org")
     })
 
-    it("returns null when no token is stored", async () => {
-        const { getUserEmail } = await import("./auth")
+    it("returns null when no token is stored", () => {
         expect(getUserEmail()).toBeNull()
     })
 
-    it("returns null for a malformed token", async () => {
-        const { getUserEmail } = await import("./auth")
+    it("returns null for a malformed token", () => {
         setToken("not-a-jwt")
         expect(getUserEmail()).toBeNull()
     })
