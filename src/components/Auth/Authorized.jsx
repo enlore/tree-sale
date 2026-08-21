@@ -1,8 +1,18 @@
+import { useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
-import { isAuthenticated } from "../../services/auth"
+import { Loading } from "../Loading"
+import { subscribe } from "../../services/auth"
 
 export const Authorized = ({ children }) => {
-    if (!isAuthenticated()) {
+    const [user, setUser] = useState(undefined)
+
+    useEffect(() => subscribe(setUser), [])
+
+    if (user === undefined) {
+        return <Loading />
+    }
+
+    if (user === null) {
         return <Navigate to="/login" replace />
     }
 
