@@ -1,142 +1,81 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { getToken, setToken, clearToken, isAuthenticated, getUserEmail, login, TOKEN_KEY } from "./auth"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 
-const makeToken = (exp) => {
-    const payload = btoa(JSON.stringify({ email: "a@b.org", exp }))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "")
-    return `header.${payload}.signature`
-}
+const { mockAuth, mockOnAuthStateChanged, mockSignInWithPopup, mockSignOut, mockSendEmailVerification } = vi.hoisted(() => ({
+    mockAuth: { currentUser: null },
+    mockOnAuthStateChanged: vi.fn(),
+    mockSignInWithPopup: vi.fn(),
+    mockSignOut: vi.fn(),
+    mockSendEmailVerification: vi.fn()
+}))
 
-const futureExp = () => Math.floor(Date.now() / 1000) + 3600
-const pastExp = () => Math.floor(Date.now() / 1000) - 3600
+vi.mock("firebase/auth", () => ({
+    onAuthStateChanged: mockOnAuthStateChanged,
+    signInWithPopup: mockSignInWithPopup,
+    signOut: mockSignOut,
+    sendEmailVerification: mockSendEmailVerification
+}))
 
-describe("token storage", () => {
+vi.mock("./firebase", () => ({
+    auth: mockAuth,
+    googleProvider: { providerId: "google.com" },
+    microsoftProvider: { providerId: "microsoft.com" }
+}))
+
+describe("auth service", () => {
     beforeEach(() => {
-        localStorage.clear()
-    })
-
-    it("round-trips a token", () => {
-        setToken("abc")
-        expect(getToken()).toBe("abc")
-        expect(localStorage.getItem(TOKEN_KEY)).toBe("abc")
-    })
-
-    it("clearToken removes the stored token", () => {
-        setToken("abc")
-        clearToken()
-        expect(getToken()).toBeNull()
-        expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
-    })
-})
-
-describe("isAuthenticated", () => {
-    beforeEach(() => {
-        localStorage.clear()
-    })
-
-    it("is false when no token is stored", () => {
-        expect(isAuthenticated()).toBe(false)
-    })
-
-    it("is false when the token is expired", () => {
-        setToken(makeToken(pastExp()))
-        expect(isAuthenticated()).toBe(false)
-    })
-
-    it("is true when the token expires in the future", () => {
-        setToken(makeToken(futureExp()))
-        expect(isAuthenticated()).toBe(true)
-    })
-
-    it("is false when the token is not a decodable JWT", () => {
-        setToken("not-a-jwt")
-        expect(isAuthenticated()).toBe(false)
-    })
-
-    it("is false when the payload has no exp claim", () => {
-        const payload = btoa(JSON.stringify({ email: "a@b.org" })).replace(/=+$/, "")
-        setToken(`header.${payload}.signature`)
-        expect(isAuthenticated()).toBe(false)
-    })
-
-    it("is false after clearToken", () => {
-        setToken(makeToken(futureExp()))
-        clearToken()
-        expect(isAuthenticated()).toBe(false)
-    })
-})
-
-describe("login", () => {
-    beforeEach(() => {
-        localStorage.clear()
-        vi.stubEnv("VITE_API_URL", "http://api.test")
-        global.fetch = vi.fn()
-    })
-
-    afterEach(() => {
-        vi.unstubAllEnvs()
-        vi.restoreAllMocks()
-    })
-
-    it("posts the credential to /api/login and returns the token", async () => {
-        global.fetch.mockResolvedValue({
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve({ token: "app-jwt" }),
+        vi.resetModules()
+        vi.clearAllMocks()
+        mockAuth.currentUser = null
+        // Default: auth resolves immediately with no user
+        mockOnAuthStateChanged.mockImplementation((auth, cb) => {
+            Promise.resolve().then(() => cb(auth.currentUser))
+            return () => {}
         })
-
-        const token = await login("google-credential")
-
-        expect(token).toBe("app-jwt")
-        const [url, options] = global.fetch.mock.calls[0]
-        expect(url).toBe("http://api.test/api/login")
-        expect(options.method).toBe("POST")
-        expect(options.headers["Content-Type"]).toBe("application/json")
-        expect(JSON.parse(options.body)).toEqual({ credential: "google-credential" })
     })
 
-    it("posts to a same-origin path when VITE_API_URL is unset", async () => {
-        vi.stubEnv("VITE_API_URL", undefined)
-        global.fetch.mockResolvedValue({
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve({ token: "app-jwt" }),
-        })
-
-        await login("google-credential")
-
-        expect(global.fetch.mock.calls[0][0]).toBe("/api/login")
+    it("getIdToken returns null when no one is signed in", async () => {
+        const { getIdToken } = await import("./auth.js")
+        expect(await getIdToken()).toBeNull()
     })
 
-    it("throws an error carrying the status on 403", async () => {
-        global.fetch.mockResolvedValue({ ok: false, status: 403, json: () => Promise.resolve({}) })
-        await expect(login("google-credential")).rejects.toMatchObject({ status: 403 })
+    it("getIdToken returns the user token after auth restores", async () => {
+        mockAuth.currentUser = { getIdToken: vi.fn().mockResolvedValue("firebase-token") }
+        const { getIdToken } = await import("./auth.js")
+        expect(await getIdToken()).toBe("firebase-token")
     })
 
-    it("throws an error carrying the status on 401", async () => {
-        global.fetch.mockResolvedValue({ ok: false, status: 401, json: () => Promise.resolve({}) })
-        await expect(login("google-credential")).rejects.toMatchObject({ status: 401 })
-    })
-})
-
-describe("getUserEmail", () => {
-    beforeEach(() => {
-        localStorage.clear()
+    it("getIdToken passes forceRefresh through", async () => {
+        const getIdTokenMock = vi.fn().mockResolvedValue("fresh")
+        mockAuth.currentUser = { getIdToken: getIdTokenMock }
+        const { getIdToken } = await import("./auth.js")
+        await getIdToken(true)
+        expect(getIdTokenMock).toHaveBeenCalledWith(true)
     })
 
-    it("returns the email claim from the stored token", () => {
-        setToken(makeToken(futureExp()))
-        expect(getUserEmail()).toBe("a@b.org")
+    it("getUserEmail reflects the current user", async () => {
+        mockAuth.currentUser = { email: "staff@treeconservationcorps.org" }
+        const { getUserEmail } = await import("./auth.js")
+        expect(getUserEmail()).toBe("staff@treeconservationcorps.org")
     })
 
-    it("returns null when no token is stored", () => {
-        expect(getUserEmail()).toBeNull()
+    it("signInWithGoogle and signInWithMicrosoft pop the right providers", async () => {
+        const { signInWithGoogle, signInWithMicrosoft } = await import("./auth.js")
+        await signInWithGoogle()
+        await signInWithMicrosoft()
+        expect(mockSignInWithPopup).toHaveBeenNthCalledWith(1, mockAuth, { providerId: "google.com" })
+        expect(mockSignInWithPopup).toHaveBeenNthCalledWith(2, mockAuth, { providerId: "microsoft.com" })
     })
 
-    it("returns null for a malformed token", () => {
-        setToken("not-a-jwt")
-        expect(getUserEmail()).toBeNull()
+    it("logOut signs out of Firebase", async () => {
+        const { logOut } = await import("./auth.js")
+        await logOut()
+        expect(mockSignOut).toHaveBeenCalledWith(mockAuth)
+    })
+
+    it("sendVerificationEmail targets the current user", async () => {
+        mockAuth.currentUser = { email: "x@example.com" }
+        const { sendVerificationEmail } = await import("./auth.js")
+        await sendVerificationEmail()
+        expect(mockSendEmailVerification).toHaveBeenCalledWith(mockAuth.currentUser)
     })
 })
