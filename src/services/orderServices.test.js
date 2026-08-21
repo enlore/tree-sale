@@ -1,6 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { authFetch, getAllOrders, getOrderById, getOrdersByCustomer, getSalesData } from "./orderServices"
-import { setToken, getToken } from "./auth"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+
+const { mockGetIdToken, mockLogOut } = vi.hoisted(() => ({
+    mockGetIdToken: vi.fn(),
+    mockLogOut: vi.fn()
+}))
+
+vi.mock("./auth", () => ({
+    getIdToken: mockGetIdToken,
+    logOut: mockLogOut
+}))
+
+import { authFetch, getAllOrders, getOrderById, getOrdersByCustomer, getSalesData } from "./orderServices.jsx"
 
 let originalLocation
 let assign
@@ -27,8 +37,9 @@ const okResponse = (body) => ({ ok: true, status: 200, json: () => Promise.resol
 
 describe("authFetch", () => {
     beforeEach(() => {
-        localStorage.clear()
         vi.stubEnv("VITE_API_URL", "http://api.test")
+        mockGetIdToken.mockResolvedValue("firebase-token")
+        mockLogOut.mockResolvedValue()
         global.fetch = vi.fn()
         stubLocation()
     })
@@ -37,10 +48,10 @@ describe("authFetch", () => {
         restoreLocation()
         vi.unstubAllEnvs()
         vi.restoreAllMocks()
+        vi.clearAllMocks()
     })
 
-    it("prepends the API url and attaches the bearer token", async () => {
-        setToken("app-jwt")
+    it("prepends the API url and attaches the Firebase ID token as a Bearer header", async () => {
         global.fetch.mockResolvedValue(okResponse([{ id: 1 }]))
 
         const data = await authFetch("/api/orders")
@@ -48,7 +59,7 @@ describe("authFetch", () => {
         expect(data).toEqual([{ id: 1 }])
         const [url, options] = global.fetch.mock.calls[0]
         expect(url).toBe("http://api.test/api/orders")
-        expect(options.headers.Authorization).toBe("Bearer app-jwt")
+        expect(options.headers.Authorization).toBe("Bearer firebase-token")
     })
 
     it("falls back to a same-origin path when VITE_API_URL is unset", async () => {
@@ -60,41 +71,46 @@ describe("authFetch", () => {
         expect(global.fetch.mock.calls[0][0]).toBe("/api/orders")
     })
 
-    it("sends no Authorization header when there is no token", async () => {
-        global.fetch.mockResolvedValue(okResponse([]))
+    it("redirects to /login without calling the API when there is no user", async () => {
+        mockGetIdToken.mockResolvedValue(null)
 
-        await authFetch("/api/orders")
+        await expect(authFetch("/api/orders")).rejects.toThrow("Unauthorized")
 
-        const [, options] = global.fetch.mock.calls[0]
-        expect(options.headers.Authorization).toBeUndefined()
+        expect(assign).toHaveBeenCalledWith("/login")
+        expect(global.fetch).not.toHaveBeenCalled()
     })
 
-    it("clears the token and redirects to /login on 401", async () => {
-        setToken("app-jwt")
+    it("signs out and redirects to /login on a 401", async () => {
         global.fetch.mockResolvedValue({ ok: false, status: 401, json: () => Promise.resolve({}) })
 
-        await expect(authFetch("/api/orders")).rejects.toThrow()
+        await expect(authFetch("/api/orders")).rejects.toThrow("Unauthorized")
 
-        expect(getToken()).toBeNull()
+        expect(mockLogOut).toHaveBeenCalled()
         expect(assign).toHaveBeenCalledWith("/login")
     })
 
-    it("throws on a non-401 error response without clearing the token", async () => {
-        setToken("app-jwt")
+    it("redirects to /pending-access on a 403 without signing out", async () => {
+        global.fetch.mockResolvedValue({ ok: false, status: 403, json: () => Promise.resolve({}) })
+
+        await expect(authFetch("/api/orders")).rejects.toThrow("Forbidden")
+
+        expect(assign).toHaveBeenCalledWith("/pending-access")
+        expect(mockLogOut).not.toHaveBeenCalled()
+    })
+
+    it("throws on other non-ok statuses without redirecting", async () => {
         global.fetch.mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) })
 
-        await expect(authFetch("/api/orders")).rejects.toThrow()
+        await expect(authFetch("/api/orders")).rejects.toThrow("failed with status 500")
 
-        expect(getToken()).toBe("app-jwt")
         expect(assign).not.toHaveBeenCalled()
     })
 })
 
 describe("order service requests", () => {
     beforeEach(() => {
-        localStorage.clear()
         vi.stubEnv("VITE_API_URL", "http://api.test")
-        setToken("app-jwt")
+        mockGetIdToken.mockResolvedValue("firebase-token")
         global.fetch = vi.fn().mockResolvedValue(okResponse([]))
         stubLocation()
     })
@@ -103,6 +119,7 @@ describe("order service requests", () => {
         restoreLocation()
         vi.unstubAllEnvs()
         vi.restoreAllMocks()
+        vi.clearAllMocks()
     })
 
     it("getAllOrders requests every order when no status is given", async () => {

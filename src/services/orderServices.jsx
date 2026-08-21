@@ -1,14 +1,26 @@
-import { clearToken, getToken } from "./auth"
+import { getIdToken, logOut } from "./auth"
 
 export const authFetch = async (path) => {
-    const token = getToken()
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}${path}`, { headers })
+    const token = await getIdToken()
 
-    if (res.status === 401) {
-        clearToken()
+    if (!token) {
         window.location.assign("/login")
         throw new Error("Unauthorized")
+    }
+
+    const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}${path}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+
+    if (res.status === 401) {
+        await logOut()
+        window.location.assign("/login")
+        throw new Error("Unauthorized")
+    }
+
+    if (res.status === 403) {
+        window.location.assign("/pending-access")
+        throw new Error("Forbidden")
     }
 
     if (!res.ok) {
