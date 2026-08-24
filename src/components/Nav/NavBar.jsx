@@ -1,14 +1,14 @@
 import "./NavBar.css"
 import { NavLink, useNavigate } from "react-router-dom"
-import { clearToken, getUserEmail } from "../../services/auth"
+import { getUserEmail, logOut } from "../../services/auth"
 import logo from "../../assets/ntcc-logo.png"
 
 export const NavBar = () => {
     const navigate = useNavigate()
     const email = getUserEmail()
 
-    const handleSignOut = () => {
-        clearToken()
+    const handleSignOut = async () => {
+        await logOut()
         navigate("/login")
     }
 

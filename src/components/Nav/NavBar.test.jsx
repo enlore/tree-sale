@@ -1,17 +1,17 @@
-import { describe, it, expect, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { NavBar } from "./NavBar"
-import { setToken, TOKEN_KEY } from "../../services/auth"
 
-const tokenFor = (email) => {
-    const exp = Math.floor(Date.now() / 1000) + 3600
-    const payload = btoa(JSON.stringify({ email, exp }))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "")
-    return `header.${payload}.signature`
-}
+const { mockGetUserEmail, mockLogOut } = vi.hoisted(() => ({
+    mockGetUserEmail: vi.fn(),
+    mockLogOut: vi.fn(),
+}))
+
+vi.mock("../../services/auth", () => ({
+    getUserEmail: mockGetUserEmail,
+    logOut: mockLogOut,
+}))
 
 const renderNavBar = () =>
     render(
@@ -22,18 +22,19 @@ const renderNavBar = () =>
 
 describe("NavBar greeting", () => {
     beforeEach(() => {
-        localStorage.clear()
+        mockGetUserEmail.mockReset()
+        mockLogOut.mockReset()
     })
 
     it("greets the logged-in email", () => {
-        setToken(tokenFor("dana@treeconservationcorps.org"))
+        mockGetUserEmail.mockReturnValue("dana@treeconservationcorps.org")
         renderNavBar()
 
         expect(screen.getByText(/hi dana@treeconservationcorps\.org/i)).toBeInTheDocument()
     })
 
     it("renders no greeting without a token", () => {
-        localStorage.removeItem(TOKEN_KEY)
+        mockGetUserEmail.mockReturnValue(null)
         renderNavBar()
 
         expect(screen.queryByText(/^hi /i)).not.toBeInTheDocument()
