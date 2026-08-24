@@ -4,6 +4,8 @@ import { getAllOrders } from "../../services/orderServices"
 import { SearchBar } from "./SearchBar"
 import { Order } from "./Order"
 import { SproutIcon } from "./SproutIcon"
+import { Loading } from "../Loading"
+import { ErrorMessage } from "../ErrorMessage"
 
 const sortOrders = (orders, sortOption) => {
     const sorted = [...orders]
@@ -26,15 +28,19 @@ const emptyMessage = (statusFilter) => {
 export const AllOrders = ({ statusFilter, pageTitle }) => {
     const [orders, setOrders] = useState([])
     const [loadedFor, setLoadedFor] = useState(null)
+    const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterOption, setFilterOption] = useState("none")
     const [sortOption, setSortOption] = useState("newest")
 
     useEffect(() => {
-        getAllOrders(statusFilter).then((orderArray) => {
-            setOrders(orderArray)
-            setLoadedFor(statusFilter ?? "ALL")
-        })
+        setError(null)
+        getAllOrders(statusFilter)
+            .then((orderArray) => {
+                setOrders(orderArray)
+                setLoadedFor(statusFilter ?? "ALL")
+            })
+            .catch((err) => setError(err.message))
     }, [statusFilter])
 
     const loaded = loadedFor === (statusFilter ?? "ALL")
@@ -86,7 +92,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
                         onChange={(event) => setSortOption(event.target.value)}
                     >
                         <option value="newest">Newest first</option>
-                        <option value="zip">Zip proximity</option>
+                        <option value="zip">Zip code</option>
                         <option value="homeowner">Homeowner</option>
                     </select>
                 </label>
@@ -94,6 +100,10 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
                 <SearchBar setSearchTerm={setSearchTerm} />
             </div>
         </div>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
+        {!loaded && !error && <Loading />}
 
         {loaded && orders.length === 0 && (
             <div className="empty-state">

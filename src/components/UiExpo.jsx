@@ -1,5 +1,6 @@
 import "./UiExpo.css"
 import { Loading } from "./Loading"
+import { ErrorMessage } from "./ErrorMessage"
 import { StatusBadge } from "./Orders/StatusBadge"
 import { SproutIcon } from "./Orders/SproutIcon"
 
@@ -21,6 +22,12 @@ export const UiExpo = () => {
                     <StatusBadge status="PENDING" large />
                     <StatusBadge status="FULFILLED" large />
                 </div>
+            </section>
+
+            <section className="expo-section">
+                <h2 className="expo-label">Errors</h2>
+                <ErrorMessage>Rate limit exceeded. Retry in 30 seconds.</ErrorMessage>
+                <ErrorMessage>Could not load sales data. Try again in a moment.</ErrorMessage>
             </section>
 
             <section className="expo-section">

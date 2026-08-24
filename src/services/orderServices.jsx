@@ -24,7 +24,8 @@ export const authFetch = async (path) => {
     }
 
     if (!res.ok) {
-        throw new Error(`Request to ${path} failed with status ${res.status}`)
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error ?? `Request to ${path} failed with status ${res.status}`)
     }
 
     return res.json()

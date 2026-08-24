@@ -2,6 +2,7 @@ import "./Orders.css"
 import { useState, useEffect } from "react"
 import { getSalesData } from "../../services/orderServices"
 import { Loading } from "../Loading"
+import { ErrorMessage } from "../ErrorMessage"
 
 export const Sales = () => {
     const [data, setData] = useState(null)
@@ -41,7 +42,7 @@ export const Sales = () => {
                 )}
             </div>
 
-            {failed && <p className="sales-error">Could not load sales data. Try again in a moment.</p>}
+            {failed && <ErrorMessage>Could not load sales data. Try again in a moment.</ErrorMessage>}
 
             {loading ? (
                 <Loading />
