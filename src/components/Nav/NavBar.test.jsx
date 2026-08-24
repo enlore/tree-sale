@@ -33,7 +33,7 @@ describe("NavBar greeting", () => {
         expect(screen.getByText(/hi dana@treeconservationcorps\.org/i)).toBeInTheDocument()
     })
 
-    it("renders no greeting without a token", () => {
+    it("renders no greeting when signed out", () => {
         mockGetUserEmail.mockReturnValue(null)
         renderNavBar()
 

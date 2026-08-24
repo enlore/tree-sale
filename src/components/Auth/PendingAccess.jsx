@@ -37,12 +37,16 @@ export const PendingAccess = () => {
 
     const handleConfirm = async () => {
         setMessage("")
-        await user.reload()
-        if (auth.currentUser.emailVerified) {
-            await getIdToken(true)
-            navigate("/")
-        } else {
-            setMessage("Not verified yet. Click the link in the email first.")
+        try {
+            await user.reload()
+            if (auth.currentUser.emailVerified) {
+                await getIdToken(true)
+                navigate("/")
+            } else {
+                setMessage("Not verified yet. Click the link in the email first.")
+            }
+        } catch {
+            setMessage("Something went wrong. Try again in a moment.")
         }
     }
 

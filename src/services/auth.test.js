@@ -26,7 +26,7 @@ describe("auth service", () => {
         vi.resetModules()
         vi.clearAllMocks()
         mockAuth.currentUser = null
-        // Default: auth resolves immediately with no user
+        // Default: auth resolves on the next microtask with no user
         mockOnAuthStateChanged.mockImplementation((auth, cb) => {
             Promise.resolve().then(() => cb(auth.currentUser))
             return () => {}
