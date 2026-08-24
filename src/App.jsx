@@ -6,6 +6,7 @@ import { OrderDetails } from "./components/Orders/orderDetails"
 import { Sales } from "./components/Orders/Sales"
 import { Authorized } from "./components/Auth/Authorized"
 import { Login } from "./components/Auth/Login"
+import { PendingAccess } from "./components/Auth/PendingAccess"
 import { UiExpo } from "./components/UiExpo"
 
 export const App = () => {
@@ -13,6 +14,7 @@ export const App = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/ui-expo" element={<UiExpo />} />
+      <Route path="/pending-access" element={<Authorized><PendingAccess /></Authorized>} />
       <Route
         path="/"
         element={
