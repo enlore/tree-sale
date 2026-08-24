@@ -146,4 +146,9 @@ describe("order service requests", () => {
         await getSalesData()
         expect(global.fetch.mock.calls[0][0]).toBe("http://api.test/api/sales")
     })
+
+    it("getSalesData scopes the report to a season when given one", async () => {
+        await getSalesData("2025-2026")
+        expect(global.fetch.mock.calls[0][0]).toBe("http://api.test/api/sales?season=2025-2026")
+    })
 })

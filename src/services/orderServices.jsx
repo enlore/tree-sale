@@ -42,6 +42,6 @@ export const getOrdersByCustomer = (customerId) => {
     return authFetch(`/api/customers/${customerId}/orders`)
 }
 
-export const getSalesData = () => {
-    return authFetch("/api/sales")
+export const getSalesData = (season) => {
+    return authFetch(season ? `/api/sales?season=${season}` : "/api/sales")
 }

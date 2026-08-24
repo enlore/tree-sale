@@ -295,6 +295,62 @@
     margin-bottom: 24px;
 }
 
+.sales-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.season-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.season-picker select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 1rem;
+}
+
+.sales-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.summary-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 130px;
+    padding: 14px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: rgba(35, 51, 46, 0.6);
+}
+
+.sales-error {
+    color: #a33;
+    margin-bottom: 24px;
+}
+
 .sales-list {
     list-style: none;
     margin: 0;
