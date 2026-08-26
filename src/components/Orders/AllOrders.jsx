@@ -6,6 +6,7 @@ import { Order } from "./Order"
 import { SproutIcon } from "./SproutIcon"
 import { Loading } from "../Loading"
 import { ErrorMessage } from "../ErrorMessage"
+import { seasonOf, seasonsOf } from "../../services/season"
 
 const sortOrders = (orders, sortOption) => {
     const sorted = [...orders]
@@ -31,6 +32,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
     const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterOption, setFilterOption] = useState("none")
+    const [seasonOption, setSeasonOption] = useState("all")
     const [sortOption, setSortOption] = useState("newest")
 
     useEffect(() => {
@@ -44,8 +46,13 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
     }, [statusFilter])
 
     const loaded = loadedFor === (statusFilter ?? "ALL")
+    const seasons = seasonsOf(orders)
 
     let filtered = orders
+
+    if (seasonOption !== "all") {
+        filtered = filtered.filter(order => seasonOf(order.date) === seasonOption)
+    }
 
     if (searchTerm !== "") {
         filtered = filtered.filter(order =>
@@ -73,6 +80,19 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
             <h2 className="page-header">{pageTitle}</h2>
 
             <div className="controls-right">
+                <label className="control-select">
+                    <span className="control-select-label">Season</span>
+                    <select
+                        value={seasonOption}
+                        onChange={(event) => setSeasonOption(event.target.value)}
+                    >
+                        <option value="all">All seasons</option>
+                        {seasons.map((season) => (
+                            <option key={season} value={season}>{season}</option>
+                        ))}
+                    </select>
+                </label>
+
                 <label className="control-select">
                     <span className="control-select-label">Filter</span>
                     <select
