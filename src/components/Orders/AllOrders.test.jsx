@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 import { AllOrders } from "./AllOrders"
@@ -39,14 +39,26 @@ describe("AllOrders season filter", () => {
         ])
     })
 
-    it("lists every season present in the orders, newest first, and shows all by default", async () => {
+    it("defaults to the most recent season with orders and lists only seasons that have orders", async () => {
         renderAllOrders()
 
         expect(await screen.findByText("this-season")).toBeInTheDocument()
-        expect(screen.getByText("last-season")).toBeInTheDocument()
+        expect(screen.queryByText("last-season")).not.toBeInTheDocument()
 
-        const options = screen.getAllByRole("option", { name: /^\d{4}-\d{4}$/ })
+        const seasonSelect = screen.getByRole("combobox", { name: /season/i })
+        expect(seasonSelect.value).toBe("2026-2027")
+        const options = within(seasonSelect).getAllByRole("option")
         expect(options.map((option) => option.value)).toEqual(["2026-2027", "2025-2026"])
+    })
+
+    it("does not invent a season when the newest orders are from a past season", async () => {
+        mockGetAllOrders.mockResolvedValue([order("old", "2025-10-02T12:00:00.000Z")])
+        renderAllOrders()
+
+        expect(await screen.findByText("old")).toBeInTheDocument()
+        const seasonSelect = screen.getByRole("combobox", { name: /season/i })
+        expect(seasonSelect.value).toBe("2025-2026")
+        expect(within(seasonSelect).getAllByRole("option").map((option) => option.value)).toEqual(["2025-2026"])
     })
 
     it("narrows the list to the chosen season", async () => {

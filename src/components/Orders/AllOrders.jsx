@@ -33,7 +33,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
     const [error, setError] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterOption, setFilterOption] = useState("none")
-    const [seasonOption, setSeasonOption] = useState("all")
+    const [seasonOption, setSeasonOption] = useState(null)
     const [sortOption, setSortOption] = useState("newest")
 
     useEffect(() => {
@@ -41,6 +41,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
         getAllOrders(statusFilter)
             .then((orderArray) => {
                 setOrders(orderArray)
+                setSeasonOption(seasonsOf(orderArray)[0] ?? null)
                 setLoadedFor(statusFilter ?? "ALL")
             })
             .catch((err) => setError(err.message))
@@ -49,11 +50,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
     const loaded = loadedFor === (statusFilter ?? "ALL")
     const seasons = seasonsOf(orders)
 
-    let filtered = orders
-
-    if (seasonOption !== "all") {
-        filtered = filtered.filter(order => seasonOf(order.date) === seasonOption)
-    }
+    let filtered = seasonOption ? orders.filter(order => seasonOf(order.date) === seasonOption) : orders
 
     if (searchTerm !== "") {
         filtered = filtered.filter(order =>
@@ -84,10 +81,10 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
                 <label className="control-select">
                     <span className="control-select-label">Season</span>
                     <select
-                        value={seasonOption}
+                        value={seasonOption ?? ""}
                         onChange={(event) => setSeasonOption(event.target.value)}
+                        disabled={seasons.length === 0}
                     >
-                        <option value="all">All seasons</option>
                         {seasons.map((season) => (
                             <option key={season} value={season}>{season}</option>
                         ))}

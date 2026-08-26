@@ -20,4 +20,8 @@ describe("seasonsOf", () => {
         ]
         expect(seasonsOf(orders)).toEqual(["2026-2027", "2025-2026"])
     })
+
+    it("only lists seasons that have orders", () => {
+        expect(seasonsOf([{ date: "2025-10-01T00:00:00Z" }])).toEqual(["2025-2026"])
+    })
 })
