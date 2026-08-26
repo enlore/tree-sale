@@ -1,5 +1,6 @@
 import "./UiExpo.css"
 import { Loading } from "./Loading"
+import { PageTitle } from "./PageTitle"
 import { ErrorMessage } from "./ErrorMessage"
 import { StatusBadge } from "./Orders/StatusBadge"
 import { SproutIcon } from "./Orders/SproutIcon"
@@ -7,7 +8,7 @@ import { SproutIcon } from "./Orders/SproutIcon"
 export const UiExpo = () => {
     return (
         <div className="app-container">
-            <h1 className="page-title">UI Expo</h1>
+            <PageTitle>UI Expo</PageTitle>
 
             <section className="expo-section">
                 <h2 className="expo-label">Loading</h2>

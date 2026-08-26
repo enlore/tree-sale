@@ -2,6 +2,7 @@ import "./Orders.css"
 import { useState, useEffect } from "react"
 import { getSalesData } from "../../services/orderServices"
 import { Loading } from "../Loading"
+import { PageTitle } from "../PageTitle"
 import { ErrorMessage } from "../ErrorMessage"
 
 export const Sales = () => {
@@ -27,7 +28,7 @@ export const Sales = () => {
 
     return (
         <div className="app-container">
-            <h1 className="page-title">Tree Sale</h1>
+            <PageTitle>Tree Sale</PageTitle>
             <div className="sales-header">
                 <h2 className="page-header sales-heading">Sales</h2>
                 {data && (

@@ -5,6 +5,7 @@ import { SearchBar } from "./SearchBar"
 import { Order } from "./Order"
 import { SproutIcon } from "./SproutIcon"
 import { Loading } from "../Loading"
+import { PageTitle } from "../PageTitle"
 import { ErrorMessage } from "../ErrorMessage"
 import { seasonOf, seasonsOf } from "../../services/season"
 
@@ -74,7 +75,7 @@ export const AllOrders = ({ statusFilter, pageTitle }) => {
 
     return (
     <div className="app-container">
-        <h1 className="page-title">Tree Sale</h1>
+        <PageTitle>Tree Sale</PageTitle>
 
         <div className="controls-row">
             <h2 className="page-header">{pageTitle}</h2>
